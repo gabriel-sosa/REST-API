@@ -3,6 +3,17 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
+const auth = require('basic-auth');
+const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
+
+//load routes
+const courseRoute = require('./routes/course.js');
+const userRoute = require('./routes/user.js');
+
+//load models
+const User = require('./models/user.js');
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -13,7 +24,36 @@ const app = express();
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
+
+//establish connection with the database
+mongoose.connect('mongodb://localhost:27017/fsjstd-restapi');
+
 // TODO setup your api routes here
+
+//parse the request body
+app.use(bodyParser.urlencoded({ extended: false }))
+
+//verify the user credentials
+app.use((req, res, next) => {
+  const authUser = auth(req);
+  User
+    .findOne({emailAddress: authUser.name})
+    .exec()
+    .then(dbUser => {
+      if (dbUser) 
+        bcrypt
+          .compare(authUser.pass, dbUser.password)
+          .then(userFound =>{
+            if (userFound)
+              req.currentUser = dbUser._id
+          })
+          .then(() => next());
+      else
+        next();
+    })
+
+    .catch(err => next(err));
+})
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
@@ -21,6 +61,12 @@ app.get('/', (req, res) => {
     message: 'Welcome to the REST API project!',
   });
 });
+
+//setup the course routes
+app.use('/api/courses', courseRoute);
+
+//setup the user routes
+app.use('/api/users', userRoute);
 
 // send 404 if no other route matched
 app.use((req, res) => {
