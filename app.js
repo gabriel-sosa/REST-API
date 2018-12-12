@@ -24,7 +24,9 @@ app.use(morgan('dev'));
 
 
 //establish connection with the database
-mongoose.connect('mongodb://localhost:27017/fsjstd-restapi');
+mongoose.connect('mongodb://localhost:27017/fsjstd-restapi')
+  .then(() => console.log('database online'))
+  .catch(err => console.log(err));
 
 // TODO setup your api routes here
 

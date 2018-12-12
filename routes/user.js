@@ -10,10 +10,11 @@ router.get('/', (req, res, next) => {
 		User
 			.findById(req.currentUser)
 			.exec()
-			.then(user => res.json(user))
+			.then(user => res.status(200).json(user))
 			.catch(err => next(err));
 	else{
 		const err = new Error('no user logged');
+		err.status = 401;
 		next(err);
 	}
 });
@@ -32,9 +33,14 @@ router.post('/', (req, res, next) => {
 					})
 					.then(() => res.status(201).redirect('/'))
 			)
-			.catch(err => next(err));
+			.catch(err => {
+				if (err.message.endsWith('is required.'))
+					err.status = 400;
+				next(err);
+			});
 	else {
 		const err = new Error('password is required');
+		err.status = 400;
 		next(err);
 	}
 });
