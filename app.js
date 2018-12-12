@@ -4,16 +4,14 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
-const auth = require('basic-auth');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs');
 
 //load routes
 const courseRoute = require('./routes/course.js');
 const userRoute = require('./routes/user.js');
 
-//load models
-const User = require('./models/user.js');
+//load auth
+const authenticateUser = require('./auth/user.js');
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -34,26 +32,7 @@ mongoose.connect('mongodb://localhost:27017/fsjstd-restapi');
 app.use(bodyParser.urlencoded({ extended: false }))
 
 //verify the user credentials
-app.use((req, res, next) => {
-  const authUser = auth(req);
-  User
-    .findOne({emailAddress: authUser.name})
-    .exec()
-    .then(dbUser => {
-      if (dbUser) 
-        bcrypt
-          .compare(authUser.pass, dbUser.password)
-          .then(userFound =>{
-            if (userFound)
-              req.currentUser = dbUser._id
-          })
-          .then(() => next());
-      else
-        next();
-    })
-
-    .catch(err => next(err));
-})
+app.use(authenticateUser);
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
