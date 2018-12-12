@@ -1,5 +1,7 @@
+//load the mongoose module
 const mongoose = require('mongoose');
 
+//create the user schema
 const Schema = new mongoose.Schema({
 	firstName: {
 		type: String, 
@@ -12,6 +14,7 @@ const Schema = new mongoose.Schema({
 	emailAddress: {
 		type: String,
 		validate: [
+			//check that the email is not already in use
 			{
 		    	validator: value => {
 		        	return User
@@ -21,6 +24,7 @@ const Schema = new mongoose.Schema({
 		    	},
 		      	message: 'user already exists'
 		    },
+		    //check that the email is valid
 		    {
 		    	validator: value => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(value),
 		      	message: 'invalid email'
@@ -34,6 +38,8 @@ const Schema = new mongoose.Schema({
 	}
 });
 
+//create the user model
 const User = mongoose.model('user', Schema);
 
+//return the user model
 module.exports = User;

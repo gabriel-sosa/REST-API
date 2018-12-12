@@ -1,3 +1,8 @@
+# other
+nodemon.json
+RESTAPI.postman_collection.json
+seed/
+
 # Logs
 logs
 *.log
