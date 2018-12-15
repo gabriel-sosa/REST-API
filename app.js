@@ -31,7 +31,7 @@ mongoose.connect('mongodb://localhost:27017/fsjstd-restapi')
 // TODO setup your api routes here
 
 //parse the request body
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json());
 
 //verify the user credentials
 app.use(authenticateUser);
