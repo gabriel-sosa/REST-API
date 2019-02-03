@@ -1,4 +1,4 @@
-# REST API
+# [REST API](https://rest-api-treehouse-project-9.herokuapp.com/)
 ## **Grade:** :heavy_check_mark: Exceeds Expectations
 ### **Premise** 
 > In this project, you’ll create a REST API using Express. The API will provide a way for users to administer a school database containing information about courses: users can interact with the database by retrieving a list of courses, as well as adding, updating and deleting courses in the database.
